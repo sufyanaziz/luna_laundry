@@ -1,0 +1,15 @@
+export const All_Data_Pakaian = [
+  "Kaos",
+  "Kemeja",
+  "Jeans",
+  "Celana Panjang",
+  "Celana Pendek",
+  "Sepatu",
+  "Kaos Kaku",
+  "Tas",
+  "Jaket",
+  "Bad Cover & Seprai",
+  "Selimut",
+  "Handuk",
+  "Swater",
+];
