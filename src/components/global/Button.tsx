@@ -48,11 +48,11 @@ export const Button: React.FC<ButtonProps> = ({
 const StyledButton = styled.button<ButtonProps>`
   padding: 14px 1.5rem;
   background: ${props =>
-    props.background === "primary"
+    props.disabled
+      ? "gray"
+      : props.background === "primary"
       ? "var(--blueButton)"
-      : props.background === "secondary"
-      ? "var(--lightBlue)"
-      : props.disabled && "gray"};
+      : "var(--lightBlue)"};
   border: none;
   outline: none;
   color: white;

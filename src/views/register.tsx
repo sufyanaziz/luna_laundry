@@ -1,16 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
-import { TextField } from "components/global/Input";
+import { TextField, RadioInput, SelectInput } from "components/global/Input";
 import { Button } from "components/global/Button";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { useUser } from "context";
+import { getFullDays, getMonths, generateYear, formatDate } from "utils/date";
+import { validateInput, validateEmail } from "utils/validation";
 
+import { Link, RouteComponentProps } from "react-router-dom";
 import styled from "styled-components";
 
 interface Props extends RouteComponentProps {}
 
 const Register: React.FC<Props> = ({ children, history }) => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [rePassword, setRePassword] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [day, setDay] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
+  const [year, setYear] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+
+  const { loading, event } = useUser();
+
+  const dob =
+    day === "" || month === "" || year === ""
+      ? ""
+      : formatDate(`${day}-${month}-${year}`).toISOString();
+
+  const req = {
+    username,
+    password,
+    address,
+    dob,
+    email,
+    gender,
+    fullName,
+    phoneNumber,
+  };
+
+  const handleUserRegistration = () => {
+    event.register(req);
+  };
+
+  const validRegistration = () => {
+    const reqInput = { ...req, rePassword };
+    const { valid } = validateInput(reqInput);
+    if (valid) {
+      if (!validateEmail(req.email)) return { isValid: false };
+      else if (password !== rePassword) return { isValid: false };
+      else return { isValid: true };
+    } else {
+      return { isValid: false };
+    }
+  };
+
   return (
     <ComponentLayout isSelectRole={true} isLogin={false} history={history}>
       <StyledRegister>
@@ -23,8 +72,8 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Name</p>
             <TextField
               type="text"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setFullName(e.target.value)}
+              value={fullName}
               placeholder="Nama"
             />
           </div>
@@ -33,23 +82,36 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Username</p>
             <TextField
               type="text"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setUsername(e.target.value)}
+              value={username}
               placeholder="Username"
             />
           </div>
           {/* Field Gender */}
           <div className="register-card-fields">
             <p>Gender</p>
-            <TextField type="text" onChange={() => "ok"} value="" />
+            <div>
+              <RadioInput
+                label="Female"
+                value="Female"
+                checked={gender === "Female" ? true : false}
+                onChange={e => setGender(e.target.value)}
+              />
+              <RadioInput
+                label="Male"
+                value="Male"
+                checked={gender === "Male" ? true : false}
+                onChange={e => setGender(e.target.value)}
+              />
+            </div>
           </div>
           {/* Field Email */}
           <div className="register-card-fields">
             <p>Email</p>
             <TextField
               type="text"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setEmail(e.target.value)}
+              value={email}
               placeholder="Email"
             />
           </div>
@@ -58,8 +120,8 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Address</p>
             <TextField
               type="text"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setAddress(e.target.value)}
+              value={address}
               placeholder="Address"
             />
           </div>
@@ -67,23 +129,27 @@ const Register: React.FC<Props> = ({ children, history }) => {
           <div className="register-card-fields">
             <p>DoB</p>
             <div className="register-card-inputs">
-              <TextField
-                className="register-card-input"
-                type="text"
-                onChange={() => "ok"}
-                value=""
+              <SelectInput
+                value={day}
+                onChange={e => setDay(e.target.value)}
+                values={getFullDays()}
+                label="Day"
+                isRemoveLabel={day !== "" ? true : false}
               />
-              <TextField
-                className="register-card-input"
-                type="text"
-                onChange={() => "ok"}
-                value=""
+              <SelectInput
+                value={month}
+                onChange={e => setMonth(e.target.value)}
+                values={getMonths()}
+                label="Month"
+                isRemoveLabel={month !== "" ? true : false}
               />
-              <TextField
-                className="register-card-input"
-                type="text"
-                onChange={() => "ok"}
-                value=""
+              <SelectInput
+                value={year}
+                onChange={e => setYear(e.target.value)}
+                values={generateYear(1945, formatDate().getFullYear())}
+                sort={{ by: "DEC", value: "num" }}
+                label="Year"
+                isRemoveLabel={year !== "" ? true : false}
               />
             </div>
           </div>
@@ -92,8 +158,8 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Phone Number</p>
             <TextField
               type="text"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setPhoneNumber(e.target.value)}
+              value={phoneNumber}
               placeholder="Phone Number"
             />
           </div>
@@ -102,8 +168,8 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Password</p>
             <TextField
               type="password"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setPassword(e.target.value)}
+              value={password}
               placeholder="Password"
             />
           </div>
@@ -112,15 +178,28 @@ const Register: React.FC<Props> = ({ children, history }) => {
             <p>Re-Password</p>
             <TextField
               type="password"
-              onChange={() => "ok"}
-              value=""
+              onChange={e => setRePassword(e.target.value)}
+              value={rePassword}
               placeholder="Re-Password"
             />
           </div>
         </Card>
         {/* Field Action */}
         <div className="register-action">
-          <Button text="Sign Up" disabled={true} />
+          {loading ? (
+            <Button
+              text="Please wait..."
+              background="primary"
+              disabled={true}
+            />
+          ) : (
+            <Button
+              text="Sign Up"
+              disabled={!validRegistration().isValid}
+              onClick={() => handleUserRegistration()}
+              background="primary"
+            />
+          )}
         </div>
         <div className="register-link">
           <Link to="/">If you have an account, Login Here!</Link>

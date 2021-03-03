@@ -6,22 +6,47 @@ interface SelecProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   values: string[];
   value: string;
+  sort?: {
+    value: string[] | "num";
+    by: "ASC" | "DEC";
+  };
+  label?: string;
+  isRemoveLabel?: boolean;
 }
 
 export const SelectInput: React.FC<SelecProps> = ({
   onChange,
   values,
   value,
+  sort,
+  label,
+  isRemoveLabel = false,
 }) => {
+  const sortedInput: string[] =
+    sort?.value === "num"
+      ? sort?.by === "DEC"
+        ? values.sort((a: any, b: any) => b - a)
+        : values.sort((a: any, b: any) => a - b)
+      : [];
+
   return (
     <StyledSelect onChange={onChange} value={value}>
-      {values.map(value => {
-        return (
-          <React.Fragment key={value}>
-            <option value={value}>{value}</option>
-          </React.Fragment>
-        );
-      })}
+      {!isRemoveLabel && <option value="">{label}</option>}
+      {sort === undefined
+        ? values.map(value => {
+            return (
+              <React.Fragment key={value}>
+                <option value={value}>{value}</option>
+              </React.Fragment>
+            );
+          })
+        : sortedInput.map(value => {
+            return (
+              <React.Fragment key={value}>
+                <option value={value}>{value}</option>
+              </React.Fragment>
+            );
+          })}
     </StyledSelect>
   );
 };
@@ -65,4 +90,42 @@ const StyledTextField = styled.input`
   width: 100%;
   padding: 10px;
   margin: 10px 0;
+`;
+
+interface RadioInputProps {
+  onChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) | undefined;
+  value: string;
+  className?: string;
+  style?: React.CSSProperties | undefined;
+  label: string;
+  checked?: boolean | undefined;
+}
+
+export const RadioInput: React.FC<RadioInputProps> = ({
+  value,
+  onChange,
+  style,
+  className,
+  label,
+  checked,
+}) => {
+  return (
+    <StyledRadioInput>
+      <input
+        className={className}
+        type="radio"
+        value={value}
+        onChange={onChange}
+        style={style}
+        checked={checked}
+      />
+      <label>{label}</label>
+    </StyledRadioInput>
+  );
+};
+
+const StyledRadioInput = styled.div`
+  input {
+    margin-right: 10px;
+  }
 `;

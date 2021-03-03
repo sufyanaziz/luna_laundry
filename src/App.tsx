@@ -3,11 +3,13 @@ import { Switch, Route } from "react-router-dom";
 // App.css ----
 import "./App.css";
 // route -----
-import routes from "./routes";
-import { route_type } from "./utils/types/route-types";
+import routes from "routes/routes";
+import { route_type } from "routes/route-types";
 // layout -----
 import { AppLayout } from "components/layout";
 import { LoadingApp } from "components/global/Loading";
+
+import { UserProvider } from "context";
 
 interface Props {}
 
@@ -32,20 +34,22 @@ const App: React.FC<Props> = ({ children }) => {
   return (
     <AppLayout>
       <Suspense fallback={<LoadingApp />}>
-        <Switch>
-          {routes.map(route => {
-            return (
-              <PublicRoute
-                key={route.name}
-                component={route.component}
-                exact={route.exact}
-                name={route.name}
-                path={route.path}
-                type={route.type}
-              />
-            );
-          })}
-        </Switch>
+        <UserProvider>
+          <Switch>
+            {routes.map(route => {
+              return (
+                <PublicRoute
+                  key={route.name}
+                  component={route.component}
+                  exact={route.exact}
+                  name={route.name}
+                  path={route.path}
+                  type={route.type}
+                />
+              );
+            })}
+          </Switch>
+        </UserProvider>
       </Suspense>
     </AppLayout>
   );
