@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
@@ -26,7 +26,7 @@ const Register: React.FC<Props> = ({ history }) => {
   const [fullName, setFullName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
 
-  const { loading, event } = useUser();
+  const { loading, event, error } = useUser();
 
   const dob =
     day === "" || month === "" || year === ""
@@ -45,7 +45,7 @@ const Register: React.FC<Props> = ({ history }) => {
   };
 
   const handleUserRegistration = () => {
-    event.register(req);
+    event.register(req, history);
   };
 
   const validRegistration = () => {
@@ -59,6 +59,12 @@ const Register: React.FC<Props> = ({ history }) => {
       return { isValid: false };
     }
   };
+
+  useEffect(() => {
+    if (Object.keys(error).length !== 0) {
+      alert(error.message);
+    }
+  }, [error]);
 
   return (
     <ComponentLayout isSelectRole={true} isLogin={false} history={history}>

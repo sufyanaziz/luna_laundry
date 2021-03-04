@@ -6,12 +6,9 @@ import { Card } from "components/global/Card";
 import { TextField } from "components/global/Input";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { RouteComponentProps } from "react-router-dom";
+import { LocationType } from "./location-types";
 
 import axios from "axios";
-
-interface LocationType {
-  locality: string;
-}
 
 interface LocationProps extends RouteComponentProps {}
 

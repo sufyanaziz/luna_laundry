@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Link, RouteComponentProps } from "react-router-dom";
 
@@ -6,6 +6,8 @@ import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
 import { TextField } from "components/global/Input";
 import { Button } from "components/global/Button";
+import { useUser } from "context";
+import { validateInput } from "utils/validation";
 
 import styled from "styled-components";
 
@@ -14,6 +16,24 @@ interface Props extends RouteComponentProps {}
 const Login: React.FC<Props> = ({ history }) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+
+  const { event, loading, error } = useUser();
+
+  const handleLoginUser = () => {
+    event.login(username, password);
+  };
+  const validateLogin = () => {
+    const { valid } = validateInput({ username, password });
+    return {
+      isValid: valid,
+    };
+  };
+
+  useEffect(() => {
+    if (Object.keys(error).length !== 0) {
+      alert(error.message);
+    }
+  }, [error]);
 
   return (
     <ComponentLayout isSelectRole={true}>
@@ -38,13 +58,25 @@ const Login: React.FC<Props> = ({ history }) => {
           />
         </Card>
         <div className="login-action">
-          <Button
-            className="button-login"
-            text="Login"
-            type="button"
-            background="primary"
-            onClick={() => history.push("/home")}
-          />
+          {loading ? (
+            <Button
+              className="button-login"
+              text="Please wait..."
+              background="primary"
+              type="button"
+              disabled={true}
+            />
+          ) : (
+            <Button
+              className="button-login"
+              text="Login"
+              type="button"
+              background="primary"
+              onClick={handleLoginUser}
+              disabled={!validateLogin().isValid}
+            />
+          )}
+
           <Link to="/register">
             If you don't have any account yet, Click Here!
           </Link>
