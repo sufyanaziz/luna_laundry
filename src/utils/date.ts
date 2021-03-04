@@ -41,6 +41,7 @@ export const formatDate = (string?: string) => {
     getMonth: () => date.getMonth(),
     getFullYear: () => date.getFullYear(),
     toISOString: () => date.toISOString(),
+    getTime: () => date.getTime(),
   };
 };
 

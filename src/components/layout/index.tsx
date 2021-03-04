@@ -4,6 +4,7 @@ import { SelectInput } from "components/global/Input";
 import { Button } from "components/global/Button";
 import { RouteComponentProps } from "react-router-dom";
 
+import { useUser } from "context";
 // App Layout -------------------------------------------------------------
 interface AppProps {}
 
@@ -43,6 +44,8 @@ export const ComponentLayout: React.FC<Partial<ComponentProps>> = ({
 
   const roles = ["Costumer", "Admin"];
 
+  const { event } = useUser();
+
   const handleChangeSelectRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectRole(value);
@@ -63,12 +66,14 @@ export const ComponentLayout: React.FC<Partial<ComponentProps>> = ({
             value={selectRole}
           />
         )}
+
         {isLogin && (
           <div style={{ width: "100%" }}>
             <Button
               className="component-header-button"
               text="Log Out"
               background="primary"
+              onClick={() => event.logout()}
             />
           </div>
         )}
@@ -119,6 +124,11 @@ const StyledComponent = styled.div`
   @media only screen and (min-height: 735.99px) {
     .component-main {
       max-height: 500px;
+    }
+  }
+  @media only screen and (min-height: 785.99px) {
+    .component-main {
+      max-height: 530px;
     }
   }
   @media only screen and (min-height: 811.99px) {

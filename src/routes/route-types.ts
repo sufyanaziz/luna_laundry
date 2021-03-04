@@ -7,5 +7,5 @@ export type route_type = {
   component: React.LazyExoticComponent<React.FC<Props>>;
   exact: boolean;
   name: string;
-  type: string;
+  type: "public" | "private-user" | "private-admin" | "error";
 };

@@ -10,7 +10,7 @@ const AboutUs = React.lazy(() => import("../views/user/aboutUs"));
 const History = React.lazy(() => import("../views/user/history"));
 const Status = React.lazy(() => import("../views/user/status"));
 const Option = React.lazy(() => import("../views/user/option"));
-const Location = React.lazy(() => import("../views/user/location"));
+const Location = React.lazy(() => import("../views/user/location/location"));
 const RequestCourier = React.lazy(() => import("../views/user/requestCourier"));
 const PickupDate = React.lazy(() => import("../views/user/pickupDate"));
 const Order = React.lazy(() => import("../views/user/order"));
@@ -23,6 +23,9 @@ const PaymentConfirmation = React.lazy(
 const EmployeeOrders = React.lazy(
   () => import("../views/admin/employeeOrders")
 );
+// Error route -------------------------------------
+const ErrorPage = React.lazy(() => import("../views/_error"));
+
 // Route -------------------------------------------
 const routes: route_type[] = [
   // Public ------------------
@@ -132,6 +135,14 @@ const routes: route_type[] = [
     path: "/employee-orders",
     component: EmployeeOrders,
     type: "private-admin",
+  },
+  // Error Route --------
+  {
+    name: "error page",
+    exact: true,
+    path: "/*",
+    component: ErrorPage,
+    type: "error",
   },
 ];
 

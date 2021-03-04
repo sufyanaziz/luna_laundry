@@ -5,7 +5,7 @@ const isEmpty = (value: any) => {
 
 const checkUndefinedInput = (data: any) => {
   let arr: any = [];
-  let undefined: any = {};
+  let objUndefined: any = {};
 
   Object.entries(data).forEach(([key, value]) => {
     arr.push(`${key}:${value}`);
@@ -18,13 +18,13 @@ const checkUndefinedInput = (data: any) => {
     const text = `${key} is missing`;
 
     if (value === "undefined") {
-      undefined[key] = text;
+      objUndefined[key] = text;
     }
   });
 
   return {
-    isUndefined: Object.keys(undefined).length !== 0 ? true : false,
-    undefined,
+    isUndefined: Object.keys(objUndefined).length !== 0 ? true : false,
+    objUndefined,
   };
 };
 
@@ -52,10 +52,10 @@ const checkEmptyValue = (data: any) => {
 };
 
 export const validateInput = (data: any) => {
-  const { isUndefined, undefined } = checkUndefinedInput(data);
+  const { isUndefined, objUndefined } = checkUndefinedInput(data);
   if (isUndefined) {
     return {
-      errors: { _type: "undefined", ...undefined },
+      errors: { _type: "undefined", ...objUndefined },
       valid: !isUndefined,
     };
   } else {
@@ -69,6 +69,6 @@ export const validateInput = (data: any) => {
 };
 
 export const validateEmail = (email: string) => {
-  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re = /^\S+@\S+$/;
   return re.test(email);
 };
