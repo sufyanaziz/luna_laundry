@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { ComponentLayout } from "components/layout";
@@ -7,21 +7,60 @@ import { TextField } from "components/global/Input";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { RouteComponentProps } from "react-router-dom";
 
+import axios from "axios";
+
+interface LocationType {
+  locality: string;
+}
+
 interface LocationProps extends RouteComponentProps {}
 
 const Location: React.FC<LocationProps> = ({ history }) => {
+  const [location, setLocation] = useState<LocationType>({} as LocationType);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(position => {
+      console.log("Latitude is :", position.coords.latitude);
+      console.log("Longitude is :", position.coords.longitude);
+      console.log(position);
+      const x = position.coords.latitude;
+      const y = position.coords.longitude;
+      getLocation(x, y);
+    });
+  }, []);
+
+  const getLocation = async (lat: number, long: number) => {
+    setLoading(true);
+    const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
+    try {
+      const res = await axios.get(api);
+      if (res.data) {
+        setLoading(false);
+        setLocation(res.data);
+      }
+    } catch (error) {}
+  };
+
   return (
     <ComponentLayout isLogin={true}>
       <StyledLocation>
         <Card style={{ height: "100%" }} bgColor="mix-blue">
           <div className="location__my-location">
             <p>My Location :</p>
-            <TextField
-              value=""
-              onChange={e => ""}
-              type="text"
-              placeholder="Find Location"
-            />
+            {loading ? (
+              <p>...</p>
+            ) : (
+              <>
+                <TextField
+                  value=""
+                  onChange={e => ""}
+                  type="text"
+                  placeholder="Find Location"
+                />
+                <span>Current Location : {location.locality}</span>
+              </>
+            )}
           </div>
 
           <div className="location__nearby-location">
