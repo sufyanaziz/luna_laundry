@@ -13,7 +13,7 @@ import styled from "styled-components";
 
 interface Props extends RouteComponentProps {}
 
-const Register: React.FC<Props> = ({ children, history }) => {
+const Register: React.FC<Props> = ({ history }) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [rePassword, setRePassword] = useState<string>("");
