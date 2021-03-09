@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from "react";
+import React, { FC, Suspense, useEffect } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import jwtDecode from "jwt-decode";
 // App.css ----
@@ -12,12 +12,27 @@ import { LoadingApp } from "components/global/Loading";
 import { DecodeToken } from "app-types";
 import axios from "connection/axios";
 
-import { UserProvider } from "context";
+import { useUser } from "context";
 
 interface Props {}
 
-const App: React.FC<Props> = ({ children }) => {
+const App: React.FC<Props> = () => {
   const LocalStorageToken = localStorage.getItem("luna_laundry");
+
+  const { event } = useUser();
+
+  const decodingToken = () => {
+    if (LocalStorageToken !== null) {
+      const token: DecodeToken = jwtDecode(LocalStorageToken);
+      event.getDataUserFromToken({
+        customerId: token.customerId,
+        username: token.username,
+        email: token.email,
+      });
+    }
+  };
+
+  useEffect(decodingToken, [LocalStorageToken]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Public Route --------------
   const PublicRoute: FC<route_type> = ({
@@ -97,40 +112,38 @@ const App: React.FC<Props> = ({ children }) => {
   return (
     <AppLayout>
       <Suspense fallback={<LoadingApp />}>
-        <UserProvider>
-          <Switch>
-            {routes.map(route => {
-              return route.type === "public" ? (
-                <PublicRoute
-                  key={route.name}
-                  component={route.component}
-                  exact={route.exact}
-                  name={route.name}
-                  path={route.path}
-                  type={route.type}
-                />
-              ) : route.type === "error" ? (
-                <ErrorRoute
-                  key={route.name}
-                  component={route.component}
-                  exact={route.exact}
-                  name={route.name}
-                  path={route.path}
-                  type={route.type}
-                />
-              ) : (
-                <PrivateRoute
-                  key={route.name}
-                  component={route.component}
-                  exact={route.exact}
-                  name={route.name}
-                  path={route.path}
-                  type={route.type}
-                />
-              );
-            })}
-          </Switch>
-        </UserProvider>
+        <Switch>
+          {routes.map(route => {
+            return route.type === "public" ? (
+              <PublicRoute
+                key={route.name}
+                component={route.component}
+                exact={route.exact}
+                name={route.name}
+                path={route.path}
+                type={route.type}
+              />
+            ) : route.type === "error" ? (
+              <ErrorRoute
+                key={route.name}
+                component={route.component}
+                exact={route.exact}
+                name={route.name}
+                path={route.path}
+                type={route.type}
+              />
+            ) : (
+              <PrivateRoute
+                key={route.name}
+                component={route.component}
+                exact={route.exact}
+                name={route.name}
+                path={route.path}
+                type={route.type}
+              />
+            );
+          })}
+        </Switch>
       </Suspense>
     </AppLayout>
   );
