@@ -1,9 +1,12 @@
+import { LocationType } from "views/user/location/location-types";
+
 export interface StoreContext {
   storeInfo: StoreInfoType;
   response: ResponseType;
   loading: boolean;
   error: ErrorType;
   event: EventType;
+  location: LocationType;
 }
 
 export type StoreInfoType = {
@@ -27,4 +30,5 @@ export type ErrorType = {
 
 export type EventType = {
   getStoreInfo: () => void;
+  getLocationUser: (locationUser: LocationType) => void;
 };
