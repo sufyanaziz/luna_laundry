@@ -7,7 +7,7 @@ import {
   CredentialsType,
   ErrorType,
   ResLogin,
-} from "./contextUser-types";
+} from "./user-types";
 
 import { formatDate } from "utils/date";
 
@@ -15,7 +15,7 @@ interface Props {}
 
 const UserContext = React.createContext({} as contextUser);
 
-export const UserProvider: React.FC<Props> = ({ children }) => {
+export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
   /** For Credentials user */
   const [credentials, setCredentials] = React.useState<CredentialsType>(
     {} as CredentialsType
@@ -98,8 +98,15 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
     delete axios.defaults.headers.common["Authorization"];
     window.location.href = "/";
   };
-
   // --------------------------------------------------------------------
+
+  // Get Data user ---------------------------------------
+  const getDataUserFromToken = (data: CredentialsType) => {
+    if (Object.keys(data).length !== 0) {
+      setCredentials(data);
+    }
+  };
+  // -----------------------------------------------------
 
   return (
     <UserContext.Provider
@@ -111,12 +118,13 @@ export const UserProvider: React.FC<Props> = ({ children }) => {
           register,
           login,
           logout,
+          getDataUserFromToken,
         },
       }}
     >
       {children}
     </UserContext.Provider>
   );
-};
+});
 
 export const useUser = () => React.useContext(UserContext);

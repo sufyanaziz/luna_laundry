@@ -8,33 +8,73 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { RouteComponentProps } from "react-router-dom";
 import { LocationType } from "./location-types";
 
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 interface LocationProps extends RouteComponentProps {}
+
+interface ResLocationType extends AxiosResponse {
+  data: LocationType;
+}
 
 const Location: React.FC<LocationProps> = ({ history }) => {
   const [location, setLocation] = useState<LocationType>({} as LocationType);
   const [loading, setLoading] = useState<boolean>(false);
+  const [locationInput, setLocationInput] = useState<string>("");
+  const [locationError, setLocationError] = useState<boolean>(false);
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(position => {
-      console.log("Latitude is :", position.coords.latitude);
-      console.log("Longitude is :", position.coords.longitude);
-      console.log(position);
-      const x = position.coords.latitude;
-      const y = position.coords.longitude;
-      getLocation(x, y);
-    });
-  }, []);
+  // Get geolocation -----------
+  const getGeolocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          // for get position geolocation (lat, long, ...more)
+          const x = position.coords.latitude;
+          const y = position.coords.longitude;
+          getLocation(x, y);
+          setLocationError(false);
+        },
+        () => {
+          // for error user denied geolocation
+          setLocationError(true);
+        }
+      );
+    } else {
+      console.log("You're browser is not support geolocation");
+      setLocationError(true);
+    }
+  };
+
+  useEffect(getGeolocation, []);
+  // ---------------------------
+
+  // Check allow location -----
+  const checkAllowLocation = () => {
+    const locationObjectLen = Object.keys(location).length;
+    if (locationError) {
+      window.alert("failed get location, allow premission");
+    } else {
+      locationObjectLen !== 0 &&
+        window.alert(
+          "location is detected, you're location is " + location.locality
+        );
+    }
+  };
+
+  useEffect(checkAllowLocation, [location, locationError]);
+  //  ---------------------------
 
   const getLocation = async (lat: number, long: number) => {
     setLoading(true);
     const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
     try {
-      const res = await axios.get(api);
+      const res: ResLocationType = await axios.get(api);
       if (res.data) {
         setLoading(false);
         setLocation(res.data);
+        setLocationInput(res.data.locality);
+        setLocationError(false);
+      } else {
+        setLocation({} as LocationType);
       }
     } catch (error) {}
   };
@@ -48,15 +88,12 @@ const Location: React.FC<LocationProps> = ({ history }) => {
             {loading ? (
               <p>...</p>
             ) : (
-              <>
-                <TextField
-                  value=""
-                  onChange={e => ""}
-                  type="text"
-                  placeholder="Find Location"
-                />
-                <span>Current Location : {location.locality}</span>
-              </>
+              <TextField
+                value={locationInput}
+                onChange={e => setLocationInput(e.target.value)}
+                type="text"
+                placeholder="Find Location"
+              />
             )}
           </div>
 

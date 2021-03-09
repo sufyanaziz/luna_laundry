@@ -8,9 +8,13 @@ import ImageSend from "assets/img/logo1.png";
 import { Button } from "components/global/Button";
 import { RouteComponentProps } from "react-router-dom";
 
+// import { useUser } from "context";
+
 interface Props extends RouteComponentProps {}
 
 const Option: React.FC<Props> = ({ history }) => {
+  // const { credentials } = useUser();
+
   return (
     <ComponentLayout isLogin={true}>
       <StyledOption>
