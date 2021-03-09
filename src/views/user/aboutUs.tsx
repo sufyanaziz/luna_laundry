@@ -1,44 +1,67 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
 
 import styled from "styled-components";
 import { RouteComponentProps } from "react-router-dom";
+import { useStore } from "context";
 
 interface Props extends RouteComponentProps {}
 
 const AboutUs: React.FC<Props> = ({ history }) => {
+  const { event, loading, storeInfo, error } = useStore();
+
+  const checkErrorLen = Object.keys(error).length;
+  const getStoreInfoEffect = () => {
+    const storeInfoLen = Object.keys(storeInfo).length;
+    if (storeInfoLen === 0) event.getStoreInfo();
+  };
+  useEffect(getStoreInfoEffect, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <ComponentLayout isLogin={true} history={history}>
       <StyledAboutUs>
         <Card className="aboutus-card-container" bgColor="mix-blue">
           <Card className="aboutus-card-info">
-            <div className="info-jam-operasional">
-              <p className="info-header">Jam Operasional :</p>
-              <div className="info-card">
-                <p>senin-minggu: 07.00 s/d 19.00 WIB</p>
+            {loading ? (
+              <div>
+                <p>Please wait, getting info...</p>
               </div>
-            </div>
-            <div className="info-opsi-pembayaran">
-              <p className="info-header">Opsi Pembayaran :</p>
-              <div className="info-card">
-                <p>- COD</p>
-                <p>- Transfer BCA</p>
-                <p>- Transfer Mandiri</p>
-                <p>- Transfer BRI</p>
+            ) : checkErrorLen !== 0 ? (
+              <div>
+                <p>Something went wrong...</p>
               </div>
-            </div>
-            <div className="info-harga">
-              <p className="info-header">Harga :</p>
-              <div className="info-card">
-                <p>- Per Piece = Rp.-</p>
-                <p>- Per Kilo = Rp.-</p>
-                <p>- Delivery (Optional) = Rp.-</p>
-                <p>(Untuk 1 - 4kg = )</p>
-                <p>(Lebih dari 5kg Rp.1000.00 perkilo = )</p>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="info-jam-operasional">
+                  <p className="info-header">Jam Operasional :</p>
+                  <div className="info-card">
+                    <p>Senin - Minggu : {storeInfo.operationalHours}</p>
+                  </div>
+                </div>
+                <div className="info-opsi-pembayaran">
+                  <p className="info-header">Opsi Pembayaran :</p>
+                  <div className="info-card">
+                    {storeInfo.paymentMethod?.map(method => {
+                      return <p key={method}>- {method}</p>;
+                    })}
+                  </div>
+                </div>
+                <div className="info-harga">
+                  <p className="info-header">Harga :</p>
+                  <div className="info-card">
+                    <p>- Per Piece = Rp.{storeInfo.pricePerPiece}</p>
+                    <p>- Per Kilo = Rp.{storeInfo.pricePerKilo}</p>
+                    <p>
+                      - Delivery (Optional) = Rp.{storeInfo.basicDeliveryPrice}
+                    </p>
+                    <p>(Untuk 1 - 4kg = )</p>
+                    <p>(Lebih dari 5kg Rp.1000.00 perkilo)</p>
+                  </div>
+                </div>
+              </>
+            )}
           </Card>
         </Card>
       </StyledAboutUs>
@@ -58,6 +81,12 @@ const StyledAboutUs = styled.div`
     display: grid;
     grid-template-columns: 1fr;
     grid-row-gap: 14px;
+  }
+
+  .info-opsi-pembayaran .info-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-row-gap: 8px;
   }
 
   .info-header {
