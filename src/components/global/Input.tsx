@@ -97,8 +97,10 @@ interface RadioInputProps {
   value: string;
   className?: string;
   style?: React.CSSProperties | undefined;
-  label: string;
+  label?: string;
   checked?: boolean | undefined;
+  id: string;
+  onClickLabel?: () => void;
 }
 
 export const RadioInput: React.FC<RadioInputProps> = ({
@@ -108,10 +110,13 @@ export const RadioInput: React.FC<RadioInputProps> = ({
   className,
   label,
   checked,
+  id,
+  onClickLabel,
 }) => {
   return (
     <StyledRadioInput>
       <input
+        id={id}
         className={className}
         type="radio"
         value={value}
@@ -119,7 +124,7 @@ export const RadioInput: React.FC<RadioInputProps> = ({
         style={style}
         checked={checked}
       />
-      <label>{label}</label>
+      <label onClick={onClickLabel}>{label}</label>
     </StyledRadioInput>
   );
 };
