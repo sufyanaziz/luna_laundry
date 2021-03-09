@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import { ComponentLayout } from "components/layout";
@@ -6,14 +6,31 @@ import { Card } from "components/global/Card";
 import ImageSend from "assets/img/logo1.png";
 
 import { Button } from "components/global/Button";
+import { RadioInput } from "components/global/Input";
 import { RouteComponentProps } from "react-router-dom";
-
+import { validateInput } from "utils/validation";
 // import { useUser } from "context";
 
 interface Props extends RouteComponentProps {}
 
 const Option: React.FC<Props> = ({ history }) => {
   // const { credentials } = useUser();
+  const [optionPaket, setOptionPaket] = useState<string>("");
+  const [optionPenyerahan, setOptionPenyerahan] = useState<string>("");
+  const [optionPengambilan, setOptionPengambilan] = useState<string>("");
+
+  const handleSelectImagePenyerahan = (value: string) => {
+    setOptionPenyerahan(value);
+  };
+  const handleSelectImagePengambilan = (value: string) => {
+    setOptionPengambilan(value);
+  };
+
+  const disableButton = () => {
+    const data = { optionPaket, optionPenyerahan, optionPengambilan };
+    const { valid } = validateInput(data);
+    return { isDisabled: valid };
+  };
 
   return (
     <ComponentLayout isLogin={true}>
@@ -22,12 +39,24 @@ const Option: React.FC<Props> = ({ history }) => {
           <Card className="option-card">
             <div className="option-card__type">
               <div className="option-card__type-input">
-                <input type="radio" />
-                <label>Paket Biasa (3 hari)</label>
+                <RadioInput
+                  id="radio-paketBiasa"
+                  label="Paket Biasa (3 hari)"
+                  value="Paket Biasa"
+                  onChange={e => setOptionPaket(e.target.value)}
+                  checked={optionPaket === "Paket Biasa" ? true : false}
+                  onClickLabel={() => setOptionPaket("Paket Biasa")}
+                />
               </div>
               <div className="option-card__type-input">
-                <input type="radio" />
-                <label>Paket Cepat (1 hari)</label>
+                <RadioInput
+                  id="radio-paketCepat"
+                  label="Paket Cepat (1 hari)"
+                  value="Paket Cepat"
+                  onChange={e => setOptionPaket(e.target.value)}
+                  checked={optionPaket === "Paket Cepat" ? true : false}
+                  onClickLabel={() => setOptionPaket("Paket Cepat")}
+                />
               </div>
             </div>
 
@@ -37,14 +66,30 @@ const Option: React.FC<Props> = ({ history }) => {
               </div>
               <div className="option-card__get-inputs">
                 <div className="option-card__get-input">
-                  <input type="radio" />
-                  <div className="option-card__get-image">
+                  <div
+                    className="option-card__get-image"
+                    onClick={() => handleSelectImagePenyerahan("Ditempat")}
+                    style={{
+                      border:
+                        optionPenyerahan === "Ditempat"
+                          ? "2px solid var(--darkBlue)"
+                          : "none",
+                    }}
+                  >
                     <img src={ImageSend} alt="laundry-gambar" />
                   </div>
                 </div>
                 <div className="option-card__get-input">
-                  <input type="radio" />
-                  <div className="option-card__get-image">
+                  <div
+                    className="option-card__get-image"
+                    onClick={() => handleSelectImagePenyerahan("Dijemput")}
+                    style={{
+                      border:
+                        optionPenyerahan === "Dijemput"
+                          ? "2px solid var(--darkBlue)"
+                          : "none",
+                    }}
+                  >
                     <img src={ImageSend} alt="laundry-gambar" />
                   </div>
                 </div>
@@ -57,14 +102,30 @@ const Option: React.FC<Props> = ({ history }) => {
               </div>
               <div className="option-card__send-inputs">
                 <div className="option-card__send-input">
-                  <input type="radio" />
-                  <div className="option-card__send-image">
+                  <div
+                    className="option-card__send-image"
+                    onClick={() => handleSelectImagePengambilan("Sendiri")}
+                    style={{
+                      border:
+                        optionPengambilan === "Sendiri"
+                          ? "2px solid var(--darkBlue)"
+                          : "none",
+                    }}
+                  >
                     <img src={ImageSend} alt="laundry-gambar" />
                   </div>
                 </div>
                 <div className="option-card__send-input">
-                  <input type="radio" />
-                  <div className="option-card__send-image">
+                  <div
+                    className="option-card__send-image"
+                    onClick={() => handleSelectImagePengambilan("Diantar")}
+                    style={{
+                      border:
+                        optionPengambilan === "Diantar"
+                          ? "2px solid var(--darkBlue)"
+                          : "none",
+                    }}
+                  >
                     <img src={ImageSend} alt="laundry-gambar" />
                   </div>
                 </div>
@@ -81,6 +142,7 @@ const Option: React.FC<Props> = ({ history }) => {
               type="button"
               background="primary"
               onClick={() => history.push("/location")}
+              disabled={!disableButton().isDisabled}
             />
           </div>
         </Card>
