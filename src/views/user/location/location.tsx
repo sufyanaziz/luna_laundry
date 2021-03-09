@@ -9,120 +9,119 @@ import { RouteComponentProps } from "react-router-dom";
 import { LocationType } from "./location-types";
 
 import axios, { AxiosResponse } from "axios";
-
-interface LocationProps extends RouteComponentProps {}
+import { useStore } from "context";
 
 interface ResLocationType extends AxiosResponse {
   data: LocationType;
 }
 
-const Location: React.FC<LocationProps> = ({ history }) => {
-  const [location, setLocation] = useState<LocationType>({} as LocationType);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [locationInput, setLocationInput] = useState<string>("");
-  const [locationError, setLocationError] = useState<boolean>(false);
+interface Props extends RouteComponentProps {}
 
+const Location: React.FC<Props> = ({ history }) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [locationInput, setLocationInput] = useState<string>("");
+
+  const { event, location } = useStore();
+
+  const locationObjectLen = Object.keys(location).length;
   // Get geolocation -----------
   const getGeolocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          // for get position geolocation (lat, long, ...more)
-          const x = position.coords.latitude;
-          const y = position.coords.longitude;
-          getLocation(x, y);
-          setLocationError(false);
-        },
-        () => {
-          // for error user denied geolocation
-          setLocationError(true);
-        }
-      );
-    } else {
-      console.log("You're browser is not support geolocation");
-      setLocationError(true);
-    }
-  };
-
-  useEffect(getGeolocation, []);
-  // ---------------------------
-
-  // Check allow location -----
-  const checkAllowLocation = () => {
-    const locationObjectLen = Object.keys(location).length;
-    if (locationError) {
-      window.alert("failed get location, allow premission");
-    } else {
-      locationObjectLen !== 0 &&
-        window.alert(
-          "location is detected, you're location is " + location.locality
+    if (locationObjectLen === 0) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            // for get position geolocation (lat, long, ...more)
+            const x = position.coords.latitude;
+            const y = position.coords.longitude;
+            // get location from x and y
+            getLocation(x, y);
+          },
+          () => {
+            // for error user denied geolocation
+            setLoading(false);
+            window.alert("Something went wrong, location is disabled");
+          }
         );
+      } else {
+        setLoading(false);
+        console.log("The browser is not support geolocation");
+      }
+    } else {
+      setLoading(false);
+      setLocationInput(location.locality);
     }
   };
 
-  useEffect(checkAllowLocation, [location, locationError]);
-  //  ---------------------------
-
-  const getLocation = async (lat: number, long: number) => {
-    setLoading(true);
-    const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
-    try {
-      const res: ResLocationType = await axios.get(api);
-      if (res.data) {
+  // Get Location -------------------------------
+  const getLocation = React.useCallback(
+    async (lat: number, long: number) => {
+      const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
+      try {
+        const res: ResLocationType = await axios.get(api);
+        if (res.data) {
+          setLoading(false);
+          event.getLocationUser(res.data);
+          setLocationInput(res.data.locality);
+        } else {
+          setLoading(false);
+          event.getLocationUser({} as LocationType);
+        }
+      } catch (err) {
         setLoading(false);
-        setLocation(res.data);
-        setLocationInput(res.data.locality);
-        setLocationError(false);
-      } else {
-        setLocation({} as LocationType);
       }
-    } catch (error) {}
-  };
+    },
+    [event]
+  );
+  //  ---------------------------------------
+
+  useEffect(getGeolocation, [locationObjectLen, location, getLocation]);
 
   return (
     <ComponentLayout isLogin={true}>
       <StyledLocation>
         <Card style={{ height: "100%" }} bgColor="mix-blue">
-          <div className="location__my-location">
-            <p>My Location :</p>
-            {loading ? (
-              <p>...</p>
-            ) : (
-              <TextField
-                value={locationInput}
-                onChange={e => setLocationInput(e.target.value)}
-                type="text"
-                placeholder="Find Location"
-              />
-            )}
-          </div>
+          {loading ? (
+            <p>Please wait, getting location...</p>
+          ) : (
+            <>
+              <div className="location__my-location">
+                <p>My Location :</p>
+                <TextField
+                  value={locationInput}
+                  onChange={e => setLocationInput(e.target.value)}
+                  type="text"
+                  placeholder="Find Location"
+                />
+              </div>
 
-          <div className="location__nearby-location">
-            <div className="location__nearby-location-header">
-              <p>Nearby</p>
-            </div>
-            <Card
-              className="location__nearby-location-card"
-              onClick={() => history.push("/request-courier")}
-            >
-              <div className="location__nearby-location-text">
-                <p>0.3km</p>
-                <p>Jl. Pak Tahau</p>
+              <div className="location__nearby-location">
+                <div className="location__nearby-location-header">
+                  <p>Nearby</p>
+                </div>
+                <Card
+                  className="location__nearby-location-card"
+                  onClick={() => history.push("/request-courier")}
+                >
+                  <div className="location__nearby-location-text">
+                    <p>0.3km</p>
+                    <p>Jl. Pak Tahau</p>
+                  </div>
+                  <div className="location__nearby-location-icon">
+                    <FaMapMarkerAlt />
+                  </div>
+                </Card>
+                <Card className="location__nearby-location-card">
+                  <div className="location__nearby-location-text">
+                    <p>0.3km</p>
+                    <p>Jl. Pak Tahau</p>
+                  </div>
+                  <div className="location__nearby-location-icon">
+                    <FaMapMarkerAlt />
+                  </div>
+                </Card>
               </div>
-              <div className="location__nearby-location-icon">
-                <FaMapMarkerAlt />
-              </div>
-            </Card>
-            <Card className="location__nearby-location-card">
-              <div className="location__nearby-location-text">
-                <p>0.3km</p>
-                <p>Jl. Pak Tahau</p>
-              </div>
-              <div className="location__nearby-location-icon">
-                <FaMapMarkerAlt />
-              </div>
-            </Card>
-          </div>
+            </>
+          )}
         </Card>
       </StyledLocation>
     </ComponentLayout>
