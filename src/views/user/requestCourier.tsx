@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import { ComponentLayout } from "components/layout";
@@ -10,6 +10,7 @@ import { Button } from "components/global/Button";
 interface RequestCourierProps extends RouteComponentProps {}
 
 const RequestCourier: React.FC<RequestCourierProps> = ({ history }) => {
+  const [request, setRequest] = useState<string>("");
   return (
     <ComponentLayout isLogin={true}>
       <StyledRequestCourier>
@@ -21,8 +22,8 @@ const RequestCourier: React.FC<RequestCourierProps> = ({ history }) => {
             <div className="requestCourier-card__input">
               <TextField
                 type="text"
-                onChange={e => ""}
-                value=""
+                onChange={e => setRequest(e.target.value)}
+                value={request}
                 placeholder="Request kurir"
               />
             </div>
@@ -31,6 +32,7 @@ const RequestCourier: React.FC<RequestCourierProps> = ({ history }) => {
                 background="primary"
                 text="Request kurir"
                 onClick={() => history.push("/pickup-date")}
+                disabled={request.trim() === "" ? true : false}
               />
             </div>
           </Card>
