@@ -3,4 +3,7 @@ export type DecodeToken = {
   iat: number;
   roles: "ROLE_USER";
   sub: string;
+  customerId: number;
+  email: string;
+  username: string;
 };
