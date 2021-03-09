@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "connection/axios";
+import { AxiosResponse } from "axios";
 
 import {
   ResponseType,
@@ -7,8 +7,9 @@ import {
   StoreInfoType,
   ErrorType,
 } from "./store-types";
+import { LocationType } from "views/user/location/location-types";
+import axios from "connection/axios";
 import { formatDate } from "utils/date";
-import { AxiosResponse } from "axios";
 
 const CreateContextStore = React.createContext({} as StoreContext);
 
@@ -25,6 +26,8 @@ export const StoreProvider: React.FC<Props> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [error, setError] = useState<ErrorType>({} as ErrorType);
+  const [location, setLocation] = useState<LocationType>({} as LocationType);
+
   const initialMessageError = (path: string) => {
     return {
       message: "Something went wrong!",
@@ -60,6 +63,11 @@ export const StoreProvider: React.FC<Props> = ({ children }) => {
     }
   };
 
+  // Get location user --------------
+  const getLocationUser = (locationUser: LocationType) => {
+    setLocation(locationUser);
+  };
+
   return (
     <CreateContextStore.Provider
       value={{
@@ -67,8 +75,10 @@ export const StoreProvider: React.FC<Props> = ({ children }) => {
         response,
         loading,
         error,
+        location,
         event: {
           getStoreInfo,
+          getLocationUser,
         },
       }}
     >
