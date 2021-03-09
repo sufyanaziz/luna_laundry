@@ -98,16 +98,20 @@ const Register: React.FC<Props> = ({ history }) => {
             <p>Gender</p>
             <div>
               <RadioInput
+                id="radio-female"
                 label="Female"
                 value="Female"
                 checked={gender === "Female" ? true : false}
                 onChange={e => setGender(e.target.value)}
+                onClickLabel={() => setGender("Female")}
               />
               <RadioInput
+                id="radio-male"
                 label="Male"
                 value="Male"
                 checked={gender === "Male" ? true : false}
                 onChange={e => setGender(e.target.value)}
+                onClickLabel={() => setGender("Male")}
               />
             </div>
           </div>
