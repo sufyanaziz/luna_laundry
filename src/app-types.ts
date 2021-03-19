@@ -6,4 +6,5 @@ export type DecodeToken = {
   customerId: number;
   email: string;
   username: string;
+  address: string;
 };

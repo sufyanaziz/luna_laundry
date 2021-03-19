@@ -11,13 +11,14 @@ import { AppLayout } from "components/layout";
 import { LoadingApp } from "components/global/Loading";
 import { DecodeToken } from "app-types";
 import axios from "connection/axios";
-
 import { useUser } from "context";
+
+import "moment/locale/id";
 
 interface Props {}
 
 const App: React.FC<Props> = () => {
-  const LocalStorageToken = localStorage.getItem("luna_laundry");
+  const LocalStorageToken = localStorage.getItem("_authtkn");
 
   const { event } = useUser();
 
@@ -28,6 +29,7 @@ const App: React.FC<Props> = () => {
         customerId: token.customerId,
         username: token.username,
         email: token.email,
+        address: token.address,
       });
     }
   };
@@ -46,7 +48,8 @@ const App: React.FC<Props> = () => {
       const token: DecodeToken = jwtDecode(LocalStorageToken);
       // Check token expired ----
       if (token.exp <= new Date().getTime() / 1000) {
-        localStorage.removeItem("luna_laundry");
+        localStorage.removeItem("_authtkn");
+        localStorage.removeItem("_transaction");
         delete axios.defaults.headers.common["Authorization"];
         return <Redirect to="/" />;
       } else {
@@ -76,7 +79,8 @@ const App: React.FC<Props> = () => {
       const token: DecodeToken = jwtDecode(LocalStorageToken);
       // Check token expired ----
       if (token.exp <= new Date().getTime() / 1000) {
-        localStorage.removeItem("luna_laundry");
+        localStorage.removeItem("_authtkn");
+        localStorage.removeItem("_transaction");
         delete axios.defaults.headers.common["Authorization"];
         return <Redirect to="/" />;
       } else {
