@@ -4,7 +4,7 @@ import { SelectInput } from "components/global/Input";
 import { Button } from "components/global/Button";
 import { RouteComponentProps } from "react-router-dom";
 
-import { useUser } from "context";
+import { useUser, useStore } from "context";
 // App Layout -------------------------------------------------------------
 interface AppProps {}
 
@@ -45,6 +45,7 @@ export const ComponentLayout: React.FC<Partial<ComponentProps>> = ({
   const roles = ["Costumer", "Admin"];
 
   const { event } = useUser();
+  const { setStatus } = useStore();
 
   const handleChangeSelectRole = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -73,7 +74,10 @@ export const ComponentLayout: React.FC<Partial<ComponentProps>> = ({
               className="component-header-button"
               text="Log Out"
               background="primary"
-              onClick={() => event.logout()}
+              onClick={() => {
+                setStatus([]);
+                event.logout();
+              }}
             />
           </div>
         )}

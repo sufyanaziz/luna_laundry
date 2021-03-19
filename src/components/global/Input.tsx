@@ -64,6 +64,7 @@ interface PropsTextField {
   style?: React.CSSProperties | undefined;
   type: "text" | "password";
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export const TextField: React.FC<PropsTextField> = ({
@@ -73,6 +74,7 @@ export const TextField: React.FC<PropsTextField> = ({
   style,
   type,
   placeholder,
+  disabled,
 }) => {
   return (
     <StyledTextField
@@ -82,6 +84,7 @@ export const TextField: React.FC<PropsTextField> = ({
       style={style}
       type={type}
       placeholder={placeholder}
+      disabled={disabled}
     />
   );
 };
@@ -132,5 +135,8 @@ export const RadioInput: React.FC<RadioInputProps> = ({
 const StyledRadioInput = styled.div`
   input {
     margin-right: 10px;
+  }
+  label {
+    text-transform: capitalize;
   }
 `;
