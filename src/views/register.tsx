@@ -62,7 +62,7 @@ const Register: React.FC<Props> = ({ history }) => {
 
   useEffect(() => {
     if (Object.keys(error).length !== 0) {
-      alert(error.message);
+      if (error.type === "register") alert(error.message);
     }
   }, [error]);
 
@@ -72,148 +72,148 @@ const Register: React.FC<Props> = ({ history }) => {
         <div className="register-header">
           <p>Sign Up your Account</p>
         </div>
-        <Card className="register-card" bgColor="cyan">
-          {/* Field Name */}
-          <div className="register-card-fields">
-            <p>Name</p>
-            <TextField
-              type="text"
-              onChange={e => setFullName(e.target.value)}
-              value={fullName}
-              placeholder="Nama"
-            />
+        {loading ? (
+          <div className="register-card">
+            <span>Please wait...</span>
           </div>
-          {/* Field Username */}
-          <div className="register-card-fields">
-            <p>Username</p>
-            <TextField
-              type="text"
-              onChange={e => setUsername(e.target.value)}
-              value={username}
-              placeholder="Username"
-            />
-          </div>
-          {/* Field Gender */}
-          <div className="register-card-fields">
-            <p>Gender</p>
-            <div>
-              <RadioInput
-                id="radio-female"
-                label="Female"
-                value="Female"
-                checked={gender === "Female" ? true : false}
-                onChange={e => setGender(e.target.value)}
-                onClickLabel={() => setGender("Female")}
-              />
-              <RadioInput
-                id="radio-male"
-                label="Male"
-                value="Male"
-                checked={gender === "Male" ? true : false}
-                onChange={e => setGender(e.target.value)}
-                onClickLabel={() => setGender("Male")}
+        ) : (
+          <>
+            <Card className="register-card" bgColor="cyan">
+              {/* Field Name */}
+              <div className="register-card-fields">
+                <p>Name</p>
+                <TextField
+                  type="text"
+                  onChange={e => setFullName(e.target.value)}
+                  value={fullName}
+                  placeholder="Nama"
+                />
+              </div>
+              {/* Field Username */}
+              <div className="register-card-fields">
+                <p>Username</p>
+                <TextField
+                  type="text"
+                  onChange={e => setUsername(e.target.value)}
+                  value={username}
+                  placeholder="Username"
+                />
+              </div>
+              {/* Field Gender */}
+              <div className="register-card-fields">
+                <p>Gender</p>
+                <div>
+                  <RadioInput
+                    id="radio-female"
+                    label="Female"
+                    value="Female"
+                    checked={gender === "Female" ? true : false}
+                    onChange={e => setGender(e.target.value)}
+                    onClickLabel={() => setGender("Female")}
+                  />
+                  <RadioInput
+                    id="radio-male"
+                    label="Male"
+                    value="Male"
+                    checked={gender === "Male" ? true : false}
+                    onChange={e => setGender(e.target.value)}
+                    onClickLabel={() => setGender("Male")}
+                  />
+                </div>
+              </div>
+              {/* Field Email */}
+              <div className="register-card-fields">
+                <p>Email</p>
+                <TextField
+                  type="text"
+                  onChange={e => setEmail(e.target.value)}
+                  value={email}
+                  placeholder="Email"
+                />
+              </div>
+              {/* Field Address */}
+              <div className="register-card-fields">
+                <p>Address</p>
+                <TextField
+                  type="text"
+                  onChange={e => setAddress(e.target.value)}
+                  value={address}
+                  placeholder="Address"
+                />
+              </div>
+              {/* Field DoB */}
+              <div className="register-card-fields">
+                <p>DoB</p>
+                <div className="register-card-inputs">
+                  <SelectInput
+                    value={day}
+                    onChange={e => setDay(e.target.value)}
+                    values={getFullDays()}
+                    label="Day"
+                    isRemoveLabel={day !== "" ? true : false}
+                  />
+                  <SelectInput
+                    value={month}
+                    onChange={e => setMonth(e.target.value)}
+                    values={getMonths()}
+                    label="Month"
+                    isRemoveLabel={month !== "" ? true : false}
+                  />
+                  <SelectInput
+                    value={year}
+                    onChange={e => setYear(e.target.value)}
+                    values={generateYear(1945, formatDate().getFullYear())}
+                    sort={{ by: "DEC", value: "num" }}
+                    label="Year"
+                    isRemoveLabel={year !== "" ? true : false}
+                  />
+                </div>
+              </div>
+              {/* Field Phone Number */}
+              <div className="register-card-fields">
+                <p>Phone Number</p>
+                <TextField
+                  type="text"
+                  onChange={e => setPhoneNumber(e.target.value)}
+                  value={phoneNumber}
+                  placeholder="Phone Number"
+                />
+              </div>
+              {/* Field Password */}
+              <div className="register-card-fields">
+                <p>Password</p>
+                <TextField
+                  type="password"
+                  onChange={e => setPassword(e.target.value)}
+                  value={password}
+                  placeholder="Password"
+                />
+              </div>
+              {/* Field Re-Password */}
+              <div className="register-card-fields">
+                <p>Re-Password</p>
+                <TextField
+                  type="password"
+                  onChange={e => setRePassword(e.target.value)}
+                  value={rePassword}
+                  placeholder="Re-Password"
+                />
+              </div>
+            </Card>
+            {/* Field Action */}
+            <div className="register-action">
+              <Button
+                text="Sign Up"
+                disabled={!validRegistration().isValid}
+                onClick={() => handleUserRegistration()}
+                background="primary"
               />
             </div>
-          </div>
-          {/* Field Email */}
-          <div className="register-card-fields">
-            <p>Email</p>
-            <TextField
-              type="text"
-              onChange={e => setEmail(e.target.value)}
-              value={email}
-              placeholder="Email"
-            />
-          </div>
-          {/* Field Address */}
-          <div className="register-card-fields">
-            <p>Address</p>
-            <TextField
-              type="text"
-              onChange={e => setAddress(e.target.value)}
-              value={address}
-              placeholder="Address"
-            />
-          </div>
-          {/* Field DoB */}
-          <div className="register-card-fields">
-            <p>DoB</p>
-            <div className="register-card-inputs">
-              <SelectInput
-                value={day}
-                onChange={e => setDay(e.target.value)}
-                values={getFullDays()}
-                label="Day"
-                isRemoveLabel={day !== "" ? true : false}
-              />
-              <SelectInput
-                value={month}
-                onChange={e => setMonth(e.target.value)}
-                values={getMonths()}
-                label="Month"
-                isRemoveLabel={month !== "" ? true : false}
-              />
-              <SelectInput
-                value={year}
-                onChange={e => setYear(e.target.value)}
-                values={generateYear(1945, formatDate().getFullYear())}
-                sort={{ by: "DEC", value: "num" }}
-                label="Year"
-                isRemoveLabel={year !== "" ? true : false}
-              />
+            <div className="register-link">
+              <Link to="/">If you have an account, Login Here!</Link>
             </div>
-          </div>
-          {/* Field Phone Number */}
-          <div className="register-card-fields">
-            <p>Phone Number</p>
-            <TextField
-              type="text"
-              onChange={e => setPhoneNumber(e.target.value)}
-              value={phoneNumber}
-              placeholder="Phone Number"
-            />
-          </div>
-          {/* Field Password */}
-          <div className="register-card-fields">
-            <p>Password</p>
-            <TextField
-              type="password"
-              onChange={e => setPassword(e.target.value)}
-              value={password}
-              placeholder="Password"
-            />
-          </div>
-          {/* Field Re-Password */}
-          <div className="register-card-fields">
-            <p>Re-Password</p>
-            <TextField
-              type="password"
-              onChange={e => setRePassword(e.target.value)}
-              value={rePassword}
-              placeholder="Re-Password"
-            />
-          </div>
-        </Card>
-        {/* Field Action */}
-        <div className="register-action">
-          {loading ? (
-            <Button
-              text="Please wait..."
-              background="primary"
-              disabled={true}
-            />
-          ) : (
-            <Button
-              text="Sign Up"
-              disabled={!validRegistration().isValid}
-              onClick={() => handleUserRegistration()}
-              background="primary"
-            />
-          )}
-        </div>
-        <div className="register-link">
-          <Link to="/">If you have an account, Login Here!</Link>
-        </div>
+          </>
+        )}
       </StyledRegister>
     </ComponentLayout>
   );

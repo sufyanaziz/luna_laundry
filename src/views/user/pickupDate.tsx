@@ -3,10 +3,13 @@ import styled from "styled-components";
 
 import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
-import { RouteComponentProps } from "react-router-dom";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 import { SelectInput, TextField } from "components/global/Input";
 import { Button } from "components/global/Button";
 import { getFullDays, getMonths, generateYear, formatDate } from "utils/date";
+
+import { useStore } from "context";
+import { LocalStorageTransaction } from "utils/localStorage";
 
 interface PickupDateProps extends RouteComponentProps {}
 
@@ -14,6 +17,41 @@ const PickupDate: React.FC<PickupDateProps> = ({ history }) => {
   const [day, setDay] = useState<string>("");
   const [month, setMonth] = useState<string>("");
   const [year, setYear] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+
+  const timeExp = /^([0-1][0-9]|[2][0-4]):[0-5][0-9]$/;
+
+  const { transaction, setTransactions } = useStore();
+
+  const handleNextPickupDate = () => {
+    const pickUpDate =
+      day === "" || month === "" || year === "" || time === ""
+        ? ""
+        : formatDate(`${day}-${month}-${year} ${time}`).toISOString();
+
+    setTransactions({ ...transaction, pickUpDate });
+    history.push("/order");
+  };
+
+  const onDisabledButton = () => {
+    if (timeExp.test(time)) {
+      if (day === "" || month === "" || year === "" || time === "") {
+        return true;
+      } else {
+        const pickupDate = formatDate(
+          `${day}-${month}-${year} ${time}`
+        ).getTime();
+        if (pickupDate <= formatDate().getTime()) return true;
+        else return false;
+      }
+    } else {
+      return true;
+    }
+  };
+
+  const _localStorageTransaction = LocalStorageTransaction();
+  if (_localStorageTransaction === null) return <Redirect to="/option" />;
+
   return (
     <ComponentLayout isLogin={true}>
       <StyledPickupDate>
@@ -59,13 +97,21 @@ const PickupDate: React.FC<PickupDateProps> = ({ history }) => {
               <p>Waktu/Jam Pengembalian</p>
             </div>
             <div className="pickupDate-card__input">
-              <TextField type="text" value="" onChange={e => ""} />
+              <TextField
+                placeholder="00:00"
+                type="text"
+                value={time}
+                onChange={e => {
+                  setTime(e.target.value);
+                }}
+              />
             </div>
             <div className="pickupDate-card__action">
               <Button
                 text="CONFIRM"
                 background="primary"
-                onClick={() => history.push("/order")}
+                onClick={() => handleNextPickupDate()}
+                disabled={onDisabledButton()}
               />
             </div>
           </Card>

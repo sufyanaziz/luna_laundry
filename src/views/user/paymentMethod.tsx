@@ -7,28 +7,75 @@ import { RouteComponentProps } from "react-router-dom";
 import { TextField } from "components/global/Input";
 
 import { Button } from "components/global/Button";
+import { useStore } from "context";
+import { HistoryTransaction } from "context/context-store/store-types";
 
 interface PaymentMethodProps extends RouteComponentProps {}
 
 const PaymentMethod: React.FC<PaymentMethodProps> = ({ history }) => {
+  const { resTransaction, setResTransaction } = useStore();
+
+  const handleFinishTransaction = () => {
+    setResTransaction({} as HistoryTransaction);
+    history.push("/home");
+  };
+
   return (
     <ComponentLayout isLogin={true}>
       <StyledPaymentMethod>
         <Card bgColor="mix-blue" style={{ height: "100%" }}>
-          <Card className="paymentMethod-card" style={{ background: "white" }}>
-            <div className="paymentMethod-card__total">
-              <p>Total Pembayaran</p>
-              <TextField value="" onChange={e => ""} type="text" />
-            </div>
-            <div className="paymentMethod-card__information">
-              <p>Bank BCA</p>
-              <p>No. Virtual Account</p>
-              <p>112 233 445 566</p>
-            </div>
-          </Card>
-          <div className="paymentMethod-button">
-            <Button text="Confirm" type="button" background="primary" />
-          </div>
+          {Object.keys(resTransaction).length === 0 ? (
+            <React.Fragment>
+              <Card
+                className="paymentMethod-card"
+                style={{ background: "white" }}
+              >
+                <p>No transaction detected</p>
+              </Card>
+              <div className="paymentMethod-button">
+                <Button
+                  text="Back to Home"
+                  type="button"
+                  background="primary"
+                  onClick={() => history.push("/home")}
+                />
+              </div>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Card
+                className="paymentMethod-card"
+                style={{ background: "white" }}
+              >
+                <div className="paymentMethod-card__total">
+                  <p>Total Pembayaran</p>
+                  <TextField
+                    disabled={true}
+                    value={"Rp. " + resTransaction.totalPrice.toString()}
+                    onChange={e => ""}
+                    type="text"
+                  />
+                </div>
+                <div className="paymentMethod-card__information">
+                  <p>
+                    {resTransaction.paymentType === "OVO"
+                      ? "OVO"
+                      : "Bank " + resTransaction.paymentType}
+                  </p>
+                  <p>No. Virtual Account</p>
+                  <p>112 233 445 566</p>
+                </div>
+              </Card>
+              <div className="paymentMethod-button">
+                <Button
+                  text="Confirm"
+                  type="button"
+                  background="primary"
+                  onClick={handleFinishTransaction}
+                />
+              </div>
+            </React.Fragment>
+          )}
         </Card>
       </StyledPaymentMethod>
     </ComponentLayout>

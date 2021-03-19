@@ -29,9 +29,12 @@ const Login: React.FC<Props> = ({ history }) => {
     };
   };
 
+  const clearErrorEffect = () => event.clearError();
+  useEffect(clearErrorEffect, [event]);
+
   useEffect(() => {
     if (Object.keys(error).length !== 0) {
-      alert(error.message);
+      if (error.type === "login") alert(error.message);
     }
   }, [error]);
 
@@ -76,15 +79,18 @@ const Login: React.FC<Props> = ({ history }) => {
               disabled={!validateLogin().isValid}
             />
           )}
-
-          <Link to="/register">
-            If you don't have any account yet, Click Here!
-          </Link>
-          <Button
-            className="buttonOAuth-login"
-            text="Sign In with Google"
-            type="button-oauth"
-          />
+          {!loading && (
+            <>
+              <Link to="/register">
+                If you don't have any account yet, Click Here!
+              </Link>
+              <Button
+                className="buttonOAuth-login"
+                text="Sign In with Google"
+                type="button-oauth"
+              />
+            </>
+          )}
         </div>
       </StyledLogin>
     </ComponentLayout>

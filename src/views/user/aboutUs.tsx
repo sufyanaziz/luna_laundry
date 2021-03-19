@@ -10,12 +10,12 @@ import { useStore } from "context";
 interface Props extends RouteComponentProps {}
 
 const AboutUs: React.FC<Props> = ({ history }) => {
-  const { event, loading, storeInfo, error } = useStore();
+  const { getStoreInfo, loading, storeInfo, error } = useStore();
 
   const checkErrorLen = Object.keys(error).length;
   const getStoreInfoEffect = () => {
     const storeInfoLen = Object.keys(storeInfo).length;
-    if (storeInfoLen === 0) event.getStoreInfo();
+    if (storeInfoLen === 0) getStoreInfo();
   };
   useEffect(getStoreInfoEffect, []); // eslint-disable-line react-hooks/exhaustive-deps
 

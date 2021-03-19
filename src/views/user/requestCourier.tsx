@@ -3,14 +3,29 @@ import styled from "styled-components";
 
 import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
-import { RouteComponentProps } from "react-router-dom";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 import { TextField } from "components/global/Input";
 import { Button } from "components/global/Button";
+
+import { useStore, useUser } from "context";
+import { LocalStorageTransaction } from "utils/localStorage";
 
 interface RequestCourierProps extends RouteComponentProps {}
 
 const RequestCourier: React.FC<RequestCourierProps> = ({ history }) => {
-  const [request, setRequest] = useState<string>("");
+  const { setTransactions, transaction } = useStore();
+  const { credentials } = useUser();
+
+  const [request, setRequest] = useState<string>(credentials.address);
+
+  const handleNextRequest = () => {
+    setTransactions({ ...transaction, address: request });
+    history.push("/pickup-date");
+  };
+
+  const _localStorageTransaction = LocalStorageTransaction();
+  if (_localStorageTransaction === null) return <Redirect to="/option" />;
+
   return (
     <ComponentLayout isLogin={true}>
       <StyledRequestCourier>
@@ -31,7 +46,7 @@ const RequestCourier: React.FC<RequestCourierProps> = ({ history }) => {
               <Button
                 background="primary"
                 text="Request kurir"
-                onClick={() => history.push("/pickup-date")}
+                onClick={() => handleNextRequest()}
                 disabled={request.trim() === "" ? true : false}
               />
             </div>

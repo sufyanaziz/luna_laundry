@@ -5,11 +5,12 @@ import { ComponentLayout } from "components/layout";
 import { Card } from "components/global/Card";
 import { TextField } from "components/global/Input";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { RouteComponentProps } from "react-router-dom";
+import { Redirect, RouteComponentProps } from "react-router-dom";
 import { LocationType } from "./location-types";
 
 import axios, { AxiosResponse } from "axios";
 import { useStore } from "context";
+import { LocalStorageTransaction } from "utils/localStorage";
 
 interface ResLocationType extends AxiosResponse {
   data: LocationType;
@@ -21,9 +22,11 @@ const Location: React.FC<Props> = ({ history }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [locationInput, setLocationInput] = useState<string>("");
 
-  const { event, location } = useStore();
+  const { getLocationUser, location } = useStore();
 
   const locationObjectLen = Object.keys(location).length;
+  const _localStorageTransaction = LocalStorageTransaction();
+
   // Get geolocation -----------
   const getGeolocation = () => {
     if (locationObjectLen === 0) {
@@ -53,28 +56,29 @@ const Location: React.FC<Props> = ({ history }) => {
   };
 
   // Get Location -------------------------------
-  const getLocation = React.useCallback(
-    async (lat: number, long: number) => {
-      const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
-      try {
-        const res: ResLocationType = await axios.get(api);
-        if (res.data) {
-          setLoading(false);
-          event.getLocationUser(res.data);
-          setLocationInput(res.data.locality);
-        } else {
-          setLoading(false);
-          event.getLocationUser({} as LocationType);
-        }
-      } catch (err) {
+  const getLocation = React.useCallback(async (lat: number, long: number) => {
+    const api = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
+    try {
+      const res: ResLocationType = await axios.get(api);
+      if (res.data) {
         setLoading(false);
+        getLocationUser(res.data);
+        setLocationInput(res.data.locality);
+      } else {
+        setLoading(false);
+        getLocationUser({} as LocationType);
       }
-    },
-    [event]
-  );
+    } catch (err) {
+      setLoading(false);
+    }
+  }, []);
   //  ---------------------------------------
 
-  useEffect(getGeolocation, [locationObjectLen, location, getLocation]);
+  useEffect(() => {
+    if (_localStorageTransaction !== null) getGeolocation();
+  }, [locationObjectLen, location, getLocation]);
+
+  if (_localStorageTransaction === null) return <Redirect to="/option" />;
 
   return (
     <ComponentLayout isLogin={true}>
