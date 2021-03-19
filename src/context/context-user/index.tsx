@@ -7,6 +7,7 @@ import {
   CredentialsType,
   ErrorType,
   ResLogin,
+  RegisDataType,
 } from "./user-types";
 
 import { formatDate } from "utils/date";
@@ -24,44 +25,48 @@ export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   /** For Error */
   const [error, setError] = React.useState<ErrorType>({} as ErrorType);
-  const initialMessageError = (path: string) => {
+  const initialMessageError = (path: string, type: "register" | "login") => {
     return {
       message: "Something went wrong!",
       error: "error",
       path,
       timestamp: formatDate().getTime(),
       status: 500,
+      type,
     };
   };
 
   //  ----------------- Public page for login & registration ------------------
   // Register ------------------------------------------------------
-  const register = async (credentials: CredentialsType, history: History) => {
-    setLoading(true);
-    try {
-      const res = await axios.post("/secured/register", credentials);
-      if (res) {
+  const register = React.useCallback(
+    async (credentials: RegisDataType, history: History) => {
+      setLoading(true);
+      try {
+        const res = await axios.post("/secured/register", credentials);
+        if (res) {
+          setLoading(false);
+          history.push("/");
+          setError({} as ErrorType);
+        } else {
+          setLoading(false);
+          setError({} as ErrorType);
+        }
+      } catch (error) {
         setLoading(false);
-        history.push("/");
-        setError({} as ErrorType);
-      } else {
-        setLoading(false);
-        setError({} as ErrorType);
+        if (error.response) {
+          setError({ ...error.response.data, type: "register" });
+        } else {
+          setError(initialMessageError("/secured/register", "register"));
+        }
       }
-    } catch (error) {
-      setLoading(false);
-      if (error.response) {
-        setError(error.response.data);
-      } else {
-        setError(initialMessageError("/secured/register"));
-      }
-    }
-  };
+    },
+    []
+  );
   // Login --------------------------------------------------------
 
   const setAuthorization = (token: string) => {
     const lunaLaundry = `Bearer ${token}`;
-    localStorage.setItem("luna_laundry", token);
+    localStorage.setItem("_authtkn", token);
     axios.defaults.headers.common["Authorization"] = lunaLaundry;
   };
 
@@ -82,9 +87,9 @@ export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
     } catch (error) {
       setLoading(false);
       if (error.response) {
-        setError(error.response.data);
+        setError({ ...error.response.data, type: "login" });
       } else {
-        setError(initialMessageError("/secured/authenticate"));
+        setError(initialMessageError("/secured/authenticate", "login"));
       }
     }
   };
@@ -94,7 +99,7 @@ export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
     setCredentials({} as CredentialsType);
     setLoading(false);
     setError({} as ErrorType);
-    localStorage.removeItem("luna_laundry");
+    localStorage.removeItem("_authtkn");
     delete axios.defaults.headers.common["Authorization"];
     window.location.href = "/";
   };
@@ -108,6 +113,14 @@ export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
   };
   // -----------------------------------------------------
 
+  // Clear Error -----------------------
+  const clearError = () => {
+    if (Object.keys(error).length !== 0) {
+      setError({} as ErrorType);
+    }
+  };
+  // ----------------------------------
+
   return (
     <UserContext.Provider
       value={{
@@ -119,6 +132,7 @@ export const UserProvider: React.FC<Props> = React.memo(({ children }) => {
           login,
           logout,
           getDataUserFromToken,
+          clearError,
         },
       }}
     >

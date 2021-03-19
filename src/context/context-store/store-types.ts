@@ -1,12 +1,28 @@
 import { LocationType } from "views/user/location/location-types";
+import { CredentialsType } from "../context-user/user-types";
 
 export interface StoreContext {
   storeInfo: StoreInfoType;
-  response: ResponseType;
   loading: boolean;
   error: ErrorType;
-  event: EventType;
   location: LocationType;
+  transactionType: TransactionType[];
+  items: ItemType[];
+  transaction: Transaction;
+  resTransaction: HistoryTransaction;
+  historyTransaction: HistoryTransaction[];
+  status: HistoryTransaction[];
+  getStoreInfo: () => void;
+  getLocationUser: (locationUser: LocationType) => void;
+  getTransactionType: () => void;
+  getAllItems: () => void;
+  setItems: React.Dispatch<React.SetStateAction<ItemType[]>>;
+  setResTransaction: React.Dispatch<React.SetStateAction<HistoryTransaction>>;
+  setStatus: React.Dispatch<React.SetStateAction<HistoryTransaction[]>>;
+  setTransactions: (_transaction: Transaction) => void;
+  addNewTransaction: (_transaction: Transaction) => void;
+  getHistoryTransaction: (costumerId: number) => void;
+  getStatusTransaction: (costumerId: number) => void;
 }
 
 export type StoreInfoType = {
@@ -18,8 +34,6 @@ export type StoreInfoType = {
   maxDelivery: number;
 };
 
-export type ResponseType = "" | "SUCCESS" | "ERROR";
-
 export type ErrorType = {
   error: string;
   message: string;
@@ -28,7 +42,47 @@ export type ErrorType = {
   timestamp: number;
 };
 
-export type EventType = {
-  getStoreInfo: () => void;
-  getLocationUser: (locationUser: LocationType) => void;
+export type Transaction = {
+  category: string | null;
+  deliveryType: string | null;
+  items: object | null;
+  paymentType: string | null;
+  pickUpDate: string | null;
+  submissionType: string | null;
+  transactionTypeId: number | null;
+  userId: number | null;
+  address: string | null;
+};
+
+export type TransactionType = {
+  createdDate: string;
+  daysNeeded: number;
+  description: string;
+  price: number;
+  transactionTypeId: number;
+  transactionTypeName: string;
+};
+
+export type ItemType = {
+  createdDate: string;
+  description: string;
+  itemId: number;
+  itemName: string;
+  pricePerKilo: number;
+  pricePerPiece: number;
+  count?: number;
+};
+
+export type HistoryTransaction = {
+  category: string;
+  deliveryType: string;
+  finishDate: number;
+  ongkir: 0;
+  orders: object;
+  paymentType: string;
+  pickUpDate: number;
+  submissionType: string;
+  totalPrice: 0;
+  transactionType: string;
+  user: CredentialsType;
 };

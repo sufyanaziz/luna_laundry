@@ -5,12 +5,7 @@ export interface contextUser {
   credentials: CredentialsType;
   loading: boolean;
   error: ErrorType;
-  event: {
-    register: (credential: CredentialsType, history: History) => void;
-    login: (username: string, password: string) => void;
-    logout: () => void;
-    getDataUserFromToken: (data: CredentialsType) => void;
-  };
+  event: EventType;
 }
 
 export interface ResLogin extends AxiosResponse {
@@ -25,23 +20,43 @@ export type ErrorType = {
   path: string;
   status: number;
   timestamp: number;
+  type: "login" | "register";
 };
 
 export type CredentialsType = {
-  address?: string;
+  address: string;
   dob?: string;
-  email?: string | string;
+  email: string;
   fullName?: string;
   gender?: string;
   phoneNumber?: string;
   roles?: RoleType[];
-  username?: string | null;
-  customerId?: number | null;
-  createdDate?: string | null;
+  username: string;
+  customerId: number;
+  createdDate?: string;
+};
+
+export type RegisDataType = {
+  address: string;
+  dob: string;
+  email: string;
+  fullName: string;
+  gender: string;
+  phoneNumber: string;
+  username: string;
+  password: string;
 };
 
 export type RoleType = {
   description: string;
   name: string;
   roleId: number;
+};
+
+export type EventType = {
+  register: (credential: RegisDataType, history: History) => void;
+  login: (username: string, password: string) => void;
+  logout: () => void;
+  getDataUserFromToken: (data: CredentialsType) => void;
+  clearError: () => void;
 };
