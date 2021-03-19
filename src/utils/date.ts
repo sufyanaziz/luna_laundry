@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const generateYear = (date_start: number, date_end: number) => {
   let years: string[] = [];
   for (let year = date_start; year <= date_end; year++) {
@@ -33,8 +35,9 @@ const monthInYear = [
   "December",
 ];
 
-export const formatDate = (string?: string) => {
-  const date = string === undefined ? new Date() : new Date(string);
+export const formatDate = (value?: string | number) => {
+  const date = value === undefined ? new Date() : new Date(value);
+
   return {
     defaultDate: () => date,
     getDay: () => date.getDate(),
@@ -42,6 +45,7 @@ export const formatDate = (string?: string) => {
     getFullYear: () => date.getFullYear(),
     toISOString: () => date.toISOString(),
     getTime: () => date.getTime(),
+    toDateFormat: () => moment(date).format("DD MMMM YYYY"),
   };
 };
 
